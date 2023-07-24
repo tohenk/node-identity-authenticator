@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2019-2020 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2019-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -28,30 +28,24 @@ const Cmd = require('@ntlab/ntlib/cmd');
 Cmd.addBool('help', 'h', 'Show program usage').setAccessible(false);
 Cmd.addVar('config', '', 'Read app configuration from file', 'config-file');
 Cmd.addVar('port', 'p', 'Set web server port to listen', 'port');
-Cmd.addVar('mode', 'm', 'Set server mode: bridge, verifier, or mixed', 'mode');
-Cmd.addVar('logdir', '', 'Set the log file location', 'directory');
 
 if (!Cmd.parse() || (Cmd.get('help') && usage())) {
     process.exit();
 }
 
 const fs = require('fs');
-const Logger = require('@ntlab/ntlib/logger');
-const FingerprintBridge = require('./bridge');
+const Work = require('@ntlab/work/work');
+const { Identity, Socket } = require('@ntlab/identity');
 
 class App {
 
     config = {}
 
-    constructor() {
-        this.initialize();
-    }
-
     initialize() {
         let filename;
         // read configuration from command line values
-        if (process.env.FP_CONFIG && fs.existsSync(process.env.FP_CONFIG)) {
-            filename = process.env.FP_CONFIG;
+        if (process.env.ID_CONFIG && fs.existsSync(process.env.ID_CONFIG)) {
+            filename = process.env.ID_CONFIG;
         } else if (Cmd.get('config') && fs.existsSync(Cmd.get('config'))) {
             filename = Cmd.get('config');
         } else if (fs.existsSync(path.join(__dirname, 'config.json'))) {
@@ -62,87 +56,94 @@ class App {
             this.config = JSON.parse(fs.readFileSync(filename));
         }
         // check for default configuration
-        if (!this.config.debug) {
+        if (typeof this.config.debug === 'undefined') {
             this.config.debug = false;
         }
         if (Cmd.get('port')) {
             this.config.port = Cmd.get('port');
         }
-        if (Cmd.get('mode')) {
-            this.config.mode = Cmd.get('mode');
-        }
-        if (this.config.mode) {
-            switch (this.config.mode.toLowerCase()) {
-                case 'bridge':
-                    this.config.mode = 1;
-                    break;
-                case 'verifier':
-                    this.config.mode = 2;
-                    break;
-                case 'mixed':
-                    this.config.mode = 3;
-                    break;
-            }
+    }
+
+    getIdentityOptions(namespace) {
+        return {
+            backend: new Socket({http: this.http, namespace: namespace}),
+            logger: message => console.log(message)
         }
     }
 
-    run(options) {
+    initializeOpenCV() {
         return new Promise((resolve, reject) => {
-            options = options || {};
-            const port = this.config.port || 7879;
-            const http = require('http').createServer();
-            const opts = {};
-            if (this.config.cors) {
-                opts.cors = this.config.cors;
-            } else {
-                opts.cors = {origin: '*'};
-            }
-            const io = require('socket.io')(http, opts);
-            http.listen(port, () => {
-                const logdir = this.config.logdir || path.join(__dirname, 'logs');
-                if (!fs.existsSync(logdir)) fs.mkdirSync(logdir);
-                const logfile = path.join(logdir, 'app.log');
-                const logger = new Logger(logfile);
-                const fp = new FingerprintBridge({
-                    socket: io,
-                    logger: logger,
-                    mode: this.config.mode || 1,
-                    proxies: this.config.proxies || [],
-                    onstatus: (status, priority) => {
-                        console.log('FP: %s', status);
-                        if (typeof options.onstatus == 'function') {
-                            options.onstatus(status, priority);
-                        }
-                    }
-                });
-                process.on('exit', (code) => {
-                    fp.finalize();
-                });
-                process.on('SIGTERM', () => {
-                    fp.finalize();
-                });
-                process.on('SIGINT', () => {
-                    process.exit();
-                });
-                console.log('%s ready on port %s...', options.title ? options.title : 'DPFP Verifier', port);
-                resolve(fp);
+            const FaceId = require('@ntlab/identity-face');
+            FaceId.fixOpenCVBinDir(__dirname, this.config.debug);
+            resolve();
+        });
+    }
+
+    createServer() {
+        return new Promise((resolve, reject) => {
+            const port = this.config.port || 7978;
+            const { createServer } = require('http');
+            this.http = createServer();
+            this.http.listen(port, () => {
+                resolve(this.http);
             });
         });
     }
 
+    createFpServer() {
+        return new Promise((resolve, reject) => {
+            const FingerprintId = require('@ntlab/identity-fingerprint');
+            this.fp = new FingerprintId(Object.assign(this.getIdentityOptions('fp'), {
+                mode: Identity.MODE_VERIFIER
+            }));
+            process.on('exit', code => {
+                this.fp.finalize();
+            });
+            process.on('SIGTERM', () => {
+                this.fp.finalize();
+            });
+            resolve();
+        });
+    }
+
+    createFaceServer() {
+        return new Promise((resolve, reject) => {
+            const FaceId = require('@ntlab/identity-face');
+            this.face = new FaceId(Object.assign(this.getIdentityOptions('face'), {
+                mode: Identity.MODE_VERIFIER
+            }));
+            process.on('exit', code => {
+                this.face.finalize();
+            });
+            process.on('SIGTERM', () => {
+                this.face.finalize();
+            });
+            resolve();
+        });
+    }
+
+    run() {
+        Work.works([
+            [w => this.initializeOpenCV()],
+            [w => this.createServer()],
+            [w => this.createFpServer()],
+            [w => this.createFaceServer()],
+        ])
+        .then(() => {
+            console.log('Application ready, press Ctrl+C to end...');
+        })
+        .catch(err => {
+            console.error(err);
+        })
+    }
 }
 
 const app = new App();
 
-function run(options) {
-    app.run(options);
-}
-
-if (require.main === module) {
-    run();
-} else {
-    module.exports = {config: app.config, run: run}
-}
+(function run() {
+    app.initialize();
+    app.run();
+})();
 
 // usage help
 

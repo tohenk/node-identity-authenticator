@@ -1,0 +1,11 @@
+[Unit]
+Description=Node Identity Authenticator
+
+[Service]
+WorkingDirectory=/home/nodeapp/node-identity-authenticator
+ExecStart=/usr/bin/node app.js --port=7978
+User=nodejs
+Group=nodejs
+
+[Install]
+WantedBy=multi-user.target

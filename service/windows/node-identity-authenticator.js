@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2019 Toha <tohenk@yahoo.com>
+ * Copyright (c) 2019-2023 Toha <tohenk@yahoo.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -26,7 +26,7 @@ const args = process.argv.slice(2);
 if (args.length && (args[0] == 'install' || args[0] == 'uninstall')) {
     service(args[0]);
 } else {
-    console.log('Usage: node fpserver.js [install|uninstall]');
+    console.log('Usage: node node-identity-authenticator.js [install|uninstall]');
 }
 
 function service(cmd) {
@@ -36,12 +36,12 @@ function service(cmd) {
     const dir = fs.realpathSync(path.join(__dirname, '..', '..'));
     const app = path.join(dir, 'app.js');
     const svc = new Service({
-        name: 'NodeFPServer',
-        description: 'Node Fingerprint Server',
+        name: 'NodeIdentityAuthenticator',
+        description: 'Node Identity Authenticator',
         script: app,
         env: {
-            name: 'FP_CONFIG',
-            value: path.join(dir, 'fpserver.json')
+            name: 'ID_CONFIG',
+            value: path.join(dir, 'idserver.json')
         }
     });
     svc.on('install', () => {
