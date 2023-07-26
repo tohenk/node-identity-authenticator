@@ -6,6 +6,8 @@ WorkingDirectory=/home/nodeapp/node-identity-authenticator
 ExecStart=/usr/bin/node app.js --port=7978
 User=nodejs
 Group=nodejs
+Restart=on-failure
+RestartSec=30s
 
 [Install]
 WantedBy=multi-user.target
