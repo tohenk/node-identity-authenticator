@@ -2,6 +2,7 @@
 Description=Node Identity Authenticator
 
 [Service]
+Environment=PATH=$PATH:/usr/local/lib
 WorkingDirectory=/home/nodeapp/node-identity-authenticator
 ExecStart=/usr/bin/node app.js --port=7978
 User=nodejs
