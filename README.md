@@ -19,23 +19,28 @@ See [Digital Persona Fingerprint Bridge](https://github.com/tohenk/node-dpfb) fo
 ### ID SERVER
 
 ID SERVER is a socket.io server. Normally it is listening at port `7978`.
-ID SERVER accepts commands described below.
+Currently IDSERVER provides `http://server-ip:7978/fp` and `http://server-ip:7978/face`
+socket.io server which serves fingerprint or face identification.
+
+Each socket.io server accepts commands described below.
 
 * `count-template`, it returns same event with an object contains `count`
   property.
-* `reg-template`, pass an object with `id` and `template` property as argument.
+* `reg-template`, pass an object with `id` and `template` (a `Buffer` object) property as argument.
   It returns same event with an object contains `id` and `success` property.
 * `unreg-template`, pass an object with `id` property as argument.
   It returns same event with an object contains `id` and `success` property.
 * `has-template`, pass an object with `id` property as argument to check if
   template has been registered. It returns same event with an object contains
   `id` and `exist` property.
-* `clear-template`, clear all registered fingerprint templates.
-* `identify`, pass an object with `feature` and `workid` property as argument
-  to identify the feature against registered fingerprint templates.
+* `clear-template`, clear all registered templates.
+* `identify`, pass an object with `feature` (a `Buffer` object) and `workid` property as argument
+  to identify the feature against registered templates.
   It returns same event with an object contains `ref` (work id), `id` (internal
   id of identification process), and `data` property. To check successfull
   operation of identification, examine `matched` property of `data`.
+* `detect` (face only), pass an object with `feature` (a `Buffer` object of JPG image) to
+  do face detection. It returns same event with an object contains `face` (a `Buffer` of JPG image) property if succeded.
 
 ## Usage
 
