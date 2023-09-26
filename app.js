@@ -28,6 +28,7 @@ const Cmd = require('@ntlab/ntlib/cmd');
 Cmd.addBool('help', 'h', 'Show program usage').setAccessible(false);
 Cmd.addVar('config', '', 'Read app configuration from file', 'config-file');
 Cmd.addVar('port', 'p', 'Set web server port to listen', 'port');
+Cmd.addVar('face-size', '', 'Set normalized face size', 'size');
 
 if (!Cmd.parse() || (Cmd.get('help') && usage())) {
     process.exit();
@@ -61,6 +62,9 @@ class App {
         }
         if (Cmd.get('port')) {
             this.config.port = Cmd.get('port');
+        }
+        if (Cmd.get('face-size')) {
+            this.config.face = parseInt(Cmd.get('face-size'));
         }
     }
 
@@ -108,10 +112,12 @@ class App {
 
     createFaceServer() {
         return new Promise((resolve, reject) => {
+            const options = {mode: Identity.MODE_VERIFIER};
+            if (this.config.face) {
+                options.size = this.config.face;
+            }
             const FaceId = require('@ntlab/identity-face');
-            this.face = new FaceId(Object.assign(this.getIdentityOptions('face'), {
-                mode: Identity.MODE_VERIFIER
-            }));
+            this.face = new FaceId(Object.assign(this.getIdentityOptions('face'), options));
             process.on('exit', code => {
                 this.face.finalize();
             });
