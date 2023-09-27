@@ -41,7 +41,7 @@ function service(cmd) {
         script: app,
         env: {
             name: 'ID_CONFIG',
-            value: path.join(dir, 'idserver.json')
+            value: path.join(dir, 'config.json')
         }
     });
     svc.on('install', () => {
