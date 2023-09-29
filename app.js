@@ -37,6 +37,7 @@ if (!Cmd.parse() || (Cmd.get('help') && usage())) {
 const fs = require('fs');
 const Work = require('@ntlab/work/work');
 const { Identity, Socket } = require('@ntlab/identity');
+const CallbackNotifier = require('./notifier');
 
 class App {
 
@@ -70,7 +71,41 @@ class App {
 
     getIdentityOptions(namespace) {
         return {
-            backend: new Socket({http: this.http, namespace: namespace}),
+            backend: new Socket({
+                http: this.http,
+                namespace: namespace,
+                onrequest: (socket, channel, data) => {
+                    switch (channel) {
+                        case 'self-test':
+                            if (data.callback) {
+                                socket.callback = data.callback;
+                            }
+                            break;
+                        case 'identify':
+                            if (socket.callback) {
+                                data.workid = Identity.genId();
+                                socket.emit(channel, {id: data.workid, status: `Queued as ${data.workid}`});
+                            }
+                            break;
+                    }
+                },
+                onresponse: (socket, channel, data, res, callback) => {
+                    switch (channel) {
+                        case 'identify':
+                            if (socket.callback) {
+                                CallbackNotifier.notify(socket.callback, res)
+                                    .then(res => console.log(`Callback ${socket.callback}: ${res}`))
+                                    .catch(err => console.error(`Callback ${socket.callback}: ${err}`));
+                            } else {
+                                callback();
+                            }
+                            break;
+                        default:
+                            callback();
+                            break;
+                    }
+                }
+            }),
             logger: message => console.log(message)
         }
     }

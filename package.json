@@ -34,8 +34,8 @@
   },
   "homepage": "https://github.com/tohenk/node-identity-authenticator#readme",
   "dependencies": {
-    "@ntlab/identity-face": "^1.0.7",
-    "@ntlab/identity-fingerprint": "^1.0.7",
+    "@ntlab/identity-face": "^1.1.0",
+    "@ntlab/identity-fingerprint": "^1.1.0",
     "@ntlab/ntlib": "^2.0.5",
     "@ntlab/work": "^1.1.5"
   }
