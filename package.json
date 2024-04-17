@@ -12,8 +12,8 @@
     "build:dplib:win32": "cd node_modules/@ntlab/dplib && node-gyp rebuild --arch=ia32",
     "build:dplib:win64": "cd node_modules/@ntlab/dplib && node-gyp rebuild --arch=x64",
     "build:opencv": "export OPENCV4NODEJS_INCLUDES=/usr/local/include/opencv4 && export OPENCV4NODEJS_LIBRARIES=\"/usr/local/lib/libopencv_world.so;/usr/local/lib/opencv_img_hash.so\" && cd node_modules/@u4/opencv4nodejs && node-gyp rebuild",
-    "build:opencv:win32": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x86/vc17/lib/opencv_world480.lib;../../../../opencv/x86/vc17/lib/opencv_img_hash480.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=ia32",
-    "build:opencv:win64": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x64/vc17/lib/opencv_world480.lib;../../../../opencv/x64/vc17/lib/opencv_img_hash480.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=x64"
+    "build:opencv:win32": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x86/vc17/lib/opencv_world490.lib;../../../../opencv/x86/vc17/lib/opencv_img_hash490.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=ia32",
+    "build:opencv:win64": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x64/vc17/lib/opencv_world490.lib;../../../../opencv/x64/vc17/lib/opencv_img_hash490.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=x64"
   },
   "repository": {
     "type": "git",
@@ -34,9 +34,9 @@
   },
   "homepage": "https://github.com/tohenk/node-identity-authenticator#readme",
   "dependencies": {
-    "@ntlab/identity-face": "^1.1.0",
-    "@ntlab/identity-fingerprint": "^1.1.0",
+    "@ntlab/identity-face": "^1.1.3",
+    "@ntlab/identity-fingerprint": "^1.1.1",
     "@ntlab/ntlib": "^2.0.5",
-    "@ntlab/work": "^1.1.5"
+    "@ntlab/work": "^2.0.0"
   }
 }
