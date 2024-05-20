@@ -106,4 +106,4 @@ npm run idproxy
 
 ## Live Demo
 
-Live demo is available [here](https://ntlab.id/demo/digital-persona-fingerprint-bridge).
+Live demo is available [here](https://apps.ntlab.id/demo/digital-persona-fingerprint-bridge).
