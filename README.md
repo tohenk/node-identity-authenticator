@@ -59,14 +59,12 @@ Before building, be sure the make dependencies are all up to date, issue `npm up
 
 ```
 npm run build:dplib:win32
-npm run build:opencv:win32
 ```
 
 #### Building for 64-bit Windows Platform
 
 ```
 npm run build:dplib:win64
-npm run build:opencv:win64
 ```
 
 ### Running ID SERVER

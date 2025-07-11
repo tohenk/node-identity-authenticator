@@ -58,7 +58,7 @@ class App {
             this.config = JSON.parse(fs.readFileSync(filename));
         }
         // check for default configuration
-        if (typeof this.config.debug === 'undefined') {
+        if (this.config.debug === undefined) {
             this.config.debug = false;
         }
         if (Cmd.get('port')) {
@@ -74,7 +74,7 @@ class App {
             backend: new Socket({
                 http: this.http,
                 namespace: namespace,
-                onrequest: (socket, channel, data) => {
+                onrequest(socket, channel, data) {
                     switch (channel) {
                         case 'self-test':
                             if (data.callback) {
@@ -89,7 +89,7 @@ class App {
                             break;
                     }
                 },
-                onresponse: (socket, channel, data, res, callback) => {
+                onresponse(socket, channel, data, res, callback) {
                     switch (channel) {
                         case 'identify':
                             if (socket.callback) {
@@ -106,14 +106,22 @@ class App {
                     }
                 }
             }),
-            logger: message => console.log(message)
+            logger(...message) {
+                console.log(...message);
+            }
         }
     }
 
-    initializeOpenCV() {
+    initializeTfjs() {
         return new Promise((resolve, reject) => {
-            const FaceId = require('@ntlab/identity-face');
-            FaceId.fixOpenCVBinDir(__dirname, this.config.debug);
+            const tfjsNode = path.dirname(require.resolve('@tensorflow/tfjs-node'));
+            if (tfjsNode) {
+                const tfjsDepLib = path.resolve(tfjsNode, '..', 'deps', 'lib');
+                if (!process.env.PATH || !process.env.PATH.includes(tfjsDepLib)) {
+                    const envpath = process.env.PATH + (process.platform === 'win32' ? ';' : ':') + tfjsDepLib;
+                    process.env.PATH = envpath;
+                }
+            }
             resolve();
         });
     }
@@ -132,9 +140,10 @@ class App {
     createFpServer() {
         return new Promise((resolve, reject) => {
             const FingerprintId = require('@ntlab/identity-fingerprint');
-            this.fp = new FingerprintId(Object.assign(this.getIdentityOptions('fp'), {
-                mode: Identity.MODE_VERIFIER
-            }));
+            this.fp = new FingerprintId({
+                ...this.getIdentityOptions('fp'),
+                mode: Identity.MODE_VERIFIER,
+            });
             process.on('exit', code => {
                 this.fp.finalize();
             });
@@ -151,8 +160,8 @@ class App {
             if (this.config.face) {
                 options.size = this.config.face;
             }
-            const FaceId = require('@ntlab/identity-face');
-            this.face = new FaceId(Object.assign(this.getIdentityOptions('face'), options));
+            const FaceId = require('@ntlab/identity-face-ng');
+            this.face = new FaceId({...this.getIdentityOptions('face'), ...options});
             process.on('exit', code => {
                 this.face.finalize();
             });
@@ -165,7 +174,7 @@ class App {
 
     run() {
         Work.works([
-            [w => this.initializeOpenCV()],
+            [w => this.initializeTfjs()],
             [w => this.createServer()],
             [w => this.createFpServer()],
             [w => this.createFaceServer()],

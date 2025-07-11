@@ -1,6 +1,6 @@
 {
   "name": "@ntlab/identity-authenticator",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "An identity authentication using fingerprints or faces",
   "main": "app.js",
   "scripts": {
@@ -10,10 +10,7 @@
     "idworker2": "node app.js --port=8002",
     "build:dplib": "cd node_modules/@ntlab/dplib && node-gyp rebuild",
     "build:dplib:win32": "cd node_modules/@ntlab/dplib && node-gyp rebuild --arch=ia32",
-    "build:dplib:win64": "cd node_modules/@ntlab/dplib && node-gyp rebuild --arch=x64",
-    "build:opencv": "export OPENCV4NODEJS_INCLUDES=/usr/local/include/opencv4 && export OPENCV4NODEJS_LIBRARIES=\"/usr/local/lib/libopencv_world.so;/usr/local/lib/opencv_img_hash.so\" && cd node_modules/@u4/opencv4nodejs && node-gyp rebuild",
-    "build:opencv:win32": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x86/vc17/lib/opencv_world490.lib;../../../../opencv/x86/vc17/lib/opencv_img_hash490.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=ia32",
-    "build:opencv:win64": "set OPENCV4NODEJS_INCLUDES=../../../opencv/include&& set OPENCV4NODEJS_LIBRARIES=../../../../opencv/x64/vc17/lib/opencv_world490.lib;../../../../opencv/x64/vc17/lib/opencv_img_hash490.lib&&cd node_modules/@u4/opencv4nodejs && node-gyp rebuild --arch=x64"
+    "build:dplib:win64": "cd node_modules/@ntlab/dplib && node-gyp rebuild --arch=x64"
   },
   "repository": {
     "type": "git",
@@ -34,7 +31,7 @@
   },
   "homepage": "https://github.com/tohenk/node-identity-authenticator#readme",
   "dependencies": {
-    "@ntlab/identity-face": "^1.1.4",
+    "@ntlab/identity-face-ng": "^1.2.0",
     "@ntlab/identity-fingerprint": "^1.1.2",
     "@ntlab/ntlib": "^2.6.2",
     "@ntlab/work": "^2.3.0"
