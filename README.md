@@ -39,39 +39,25 @@ Each socket.io server accepts commands described below.
   It returns same event with an object contains `ref` (work id), `id` (internal
   id of identification process), and `data` property. To check successfull
   operation of identification, examine `matched` property of `data`.
+  A `feature` can be an array of face landmarks for face identification.
 * `detect` (face only), pass an object with `feature` (a `Buffer` object of JPG image) to
-  do face detection. It returns same event with an object contains `face` (a `Buffer` of JPG image) property if succeded.
+  do face detection. It returns same event with an object contains `faces` array if succeded.
+  Each array element will be an object with `face` (a `Buffer` of JPG image) property of detected
+  face box and `features` (array of face landmarks) property.
 
 ## Usage
 
 ### Requirements
 
-* `node-gyp` must already been installed with its dependencies (build tools),
-  to do so, type `npm install -g node-gyp`.
-* Digital Persona U.are.U SDK has been installed.
-* OpenCV has been installed.
-
-### Building Distribution Package
-
-Before building, be sure the make dependencies are all up to date, issue `npm update` to do so.
-
-#### Building for 32-bit Windows Platform
-
-```
-npm run build:dplib:win32
-```
-
-#### Building for 64-bit Windows Platform
-
-```
-npm run build:dplib:win64
-```
+* Fingerprint authentication supports both 32/64 bit systems, but face authentication which depends
+  on Tensorflow only supports 64 bit systems.
+* Digital Persona U.are.U SDK has been installed to be able performs fingerprint authentication.
 
 ### Running ID SERVER
 
 The ID SERVER can be deployed in stand alone mode, which it directly identifies
-fingerprint using the SDK or faces using OpenCV. The other option is to act as
-proxy which queries another stand alone ID SERVER located anywhere.
+fingerprint using the SDK or faces using Mediapipe face landmarks. The other option
+is to act as proxy which queries another stand alone ID SERVER located anywhere.
 
 ID SERVER configurations is mainly located in the `package.json` under the
 scripts section. Also there is `proxy.json` configuration for proxy mode.

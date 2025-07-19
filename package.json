@@ -22,7 +22,7 @@
     "identify",
     "authenticator",
     "digital persona",
-    "opencv"
+    "face landmarks"
   ],
   "author": "Toha <tohenk@yahoo.com>",
   "license": "MIT",
@@ -31,8 +31,8 @@
   },
   "homepage": "https://github.com/tohenk/node-identity-authenticator#readme",
   "dependencies": {
-    "@ntlab/identity-face-ng": "^1.4.0",
-    "@ntlab/identity-fingerprint": "^1.1.2",
+    "@ntlab/identity-face-ng": "^1.4.3",
+    "@ntlab/identity-fingerprint": "^1.2.0",
     "@ntlab/ntlib": "^2.6.2",
     "@ntlab/work": "^2.3.0"
   }
